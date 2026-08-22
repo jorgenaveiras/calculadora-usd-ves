@@ -1,10 +1,10 @@
 const CACHE_NAME = 'calc-bcv-v1';
 const urlsToCache = [
-  '/',
-  '/index.html',
-  '/styles.css',
-  '/app.js',
-  '/manifest.json'
+  './',
+  './index.html',
+  './styles.css',
+  './app.js',
+  './manifest.json'
 ];
 
 // Instalar

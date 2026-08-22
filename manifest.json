@@ -2,7 +2,7 @@
   "name": "Calculadora BCV - USD a VES",
   "short_name": "Calc BCV",
   "description": "Calculadora de Dólares a Bolívares con tasa oficial del BCV",
-  "start_url": "/index.html",
+  "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#0f1923",
   "theme_color": "#1a5276",
