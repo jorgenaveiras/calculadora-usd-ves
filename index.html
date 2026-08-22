@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Calculadora USD → VES</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#1a5276">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="description" content="Calculadora de Dólares a Bolívares con tasa oficial del BCV">
+    <link rel="apple-touch-icon" href="icons/icon-192.png">
+</head>
+<body>
+    <div class="app">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo">
+                <span class="currency-symbol">$</span>
+                <span class="arrow">→</span>
+                <span class="currency-symbol ves">Bs</span>
+            </div>
+            <h1>Calculadora BCV</h1>
+            <p class="subtitle">Tasa oficial del Banco Central de Venezuela</p>
+        </header>
+
+        <!-- Tasa actual -->
+        <div class="rate-card">
+            <div class="rate-label">Tasa Actual (Bs/USD)</div>
+            <div class="rate-value" id="currentRate">Cargando...</div>
+            <div class="rate-date" id="rateDate">--</div>
+            <div class="rate-source">Fuente: BCV</div>
+        </div>
+
+        <!-- Calculadora -->
+        <div class="calculator">
+            <div class="input-group">
+                <label for="usdAmount">Monto en Dólares ($)</label>
+                <div class="input-wrapper">
+                    <span class="input-prefix">$</span>
+                    <input type="number" id="usdAmount" placeholder="0.00" step="0.01" min="0" inputmode="decimal">
+                </div>
+            </div>
+
+            <button class="convert-btn" id="convertBtn">
+                <span>Convertir</span>
+                <span class="btn-icon">→</span>
+            </button>
+
+            <div class="result-group" id="resultGroup" style="display: none;">
+                <label>Monto en Bolívares (Bs)</label>
+                <div class="result-wrapper">
+                    <span class="result-prefix">Bs</span>
+                    <span class="result-value" id="vesResult">0.00</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Historial -->
+        <div class="history-section">
+            <div class="history-header">
+                <h2>Historial</h2>
+                <button class="clear-history-btn" id="clearHistoryBtn">Limpiar</button>
+            </div>
+            <div class="history-list" id="historyList">
+                <p class="empty-history">No hay conversiones aún</p>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <button class="refresh-btn" id="refreshBtn">
+                <span class="refresh-icon">↻</span> Actualizar tasa
+            </button>
+            <p class="footer-text">Tasa fuente: BCV (Banco Central de Venezuela)</p>
+        </footer>
+    </div>
+
+    <script src="app.js"></script>
+    <script>
+        // Registrar Service Worker para PWA
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/sw.js')
+                .then(reg => console.log('Service Worker registrado'))
+                .catch(err => console.log('Error al registrar SW:', err));
+        }
+    </script>
+</body>
+</html>
