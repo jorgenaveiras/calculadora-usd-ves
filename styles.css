@@ -174,17 +174,29 @@ input[type="number"]::-webkit-outer-spin-button {
 }
 
 .copy-btn {
-    background: var(--primary-color);
+    background: transparent;
     border: none;
-    color: white;
-    padding: 15px;
+    color: var(--text-secondary);
+    padding: 12px;
     cursor: pointer;
-    font-size: 1.2rem;
-    transition: background 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    transition: all 0.2s;
+    opacity: 0.6;
 }
 
-.copy-btn:hover {
-    background: #2980b9;
+.copy-btn:hover,
+.copy-btn:focus {
+    background: var(--primary-color);
+    color: white;
+    opacity: 1;
+}
+
+.copy-btn.copied {
+    color: var(--accent-green);
+    opacity: 1;
 }
 
 .convert-btn {
