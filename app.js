@@ -6,8 +6,8 @@ const App = {
     history: [],
     isLoading: false,
 
-    // URL del BCV
-    BCV_URL: 'https://www.bcv.org.ve/',
+    // URL del BCV con proxy CORS
+    BCV_URL: 'https://api.allorigins.win/raw?url=https://www.bcv.org.ve/',
 
     // Inicializar la app
     init() {
