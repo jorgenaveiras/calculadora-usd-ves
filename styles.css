@@ -173,6 +173,20 @@ input[type="number"]::-webkit-outer-spin-button {
     color: var(--accent-green);
 }
 
+.copy-btn {
+    background: var(--primary-color);
+    border: none;
+    color: white;
+    padding: 15px;
+    cursor: pointer;
+    font-size: 1.2rem;
+    transition: background 0.2s;
+}
+
+.copy-btn:hover {
+    background: #2980b9;
+}
+
 .convert-btn {
     width: 100%;
     padding: 18px;

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'calc-bcv-v1';
+const CACHE_NAME = 'calc-bcv-v2';
 const urlsToCache = [
   './',
   './index.html',

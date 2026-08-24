@@ -22,6 +22,7 @@ const App = {
         document.getElementById('convertBtn').addEventListener('click', () => this.convert());
         document.getElementById('refreshBtn').addEventListener('click', () => this.fetchExchangeRate());
         document.getElementById('clearHistoryBtn').addEventListener('click', () => this.clearHistory());
+        document.getElementById('copyBtn').addEventListener('click', () => this.copyResult());
         document.getElementById('usdAmount').addEventListener('keypress', (e) => {
             if (e.key === 'Enter') this.convert();
         });
@@ -180,6 +181,16 @@ const App = {
             resultGroup.style.opacity = '1';
             resultGroup.style.transform = 'translateY(0)';
         }, 10);
+    },
+
+    // Copiar resultado al portapapeles
+    copyResult() {
+        const value = document.getElementById('vesResult').textContent;
+        navigator.clipboard.writeText(value).then(() => {
+            const btn = document.getElementById('copyBtn');
+            btn.textContent = '✅';
+            setTimeout(() => btn.textContent = '📋', 1500);
+        });
     },
 
     // Animación de shake para input inválido
