@@ -67,26 +67,37 @@ const App = {
             const response = await fetch(this.BCV_URL);
             const text = await response.text();
             
-            // Buscar la tasa USD en el contenido markdown
-            // El formato es: **784,66330000** (en negrita) o 784,66330000
-            const rateMatch = text.match(/\*\*?([\d.,]+)\*\*?/);
+            // La página del BCV tiene la tasa USD en una sección específica
+            // Buscamos el patrón: "**784,66330000**" que es el dólar
+            // O el texto "Dólar" seguido del número
+            const usdRateMatch = text.match(/\*\*?(\d{1,3}[\.,]\d{2,})\*\*?/);
             
-            if (rateMatch) {
-                let rateStr = rateMatch[1];
+            if (usdRateMatch) {
+                let rateStr = usdRateMatch[1];
                 // El BCV usa coma como decimal: "784,66330000"
                 // Convertimos a formato internacional: "784.66330000"
                 rateStr = rateStr.replace(',', '.');
-                // Limitar a 4 decimales como máximo
+                // Validar que sea USD y no EUR (EUR empieza con 9...)
                 const rate = parseFloat(rateStr);
-                if (!isNaN(rate) && rate > 100 && rate < 10000) {
-                    return rate;
+                if (!isNaN(rate) && rate > 100 && rate < 1000) {
+                    // Extra seguridad: verificar que el texto contenga "Dólar" o "USD"
+                    const lowerText = text.toLowerCase();
+                    if (lowerText.includes('dólar') || lowerText.includes('usd') || lowerText.includes('dollar')) {
+                        return rate;
+                    }
                 }
             }
             
-            // Alternativa: buscar el patrón "784,..." propio de BCV
-            const alternativeMatch = text.match(/784[\.,]\d+/);
-            if (alternativeMatch) {
-                return parseFloat(alternativeMatch[0].replace(',', '.'));
+            // Alternativa: buscar específicamente la tabla de Tasas Informativas
+            // donde aparece "USD 784,66330000"
+            const tableMatch = text.match(/USD[\s\S]*?(\d{1,3}[\.,]\d{2,})/i);
+            if (tableMatch) {
+                let rateStr = tableMatch[1];
+                rateStr = rateStr.replace(',', '.');
+                const rate = parseFloat(rateStr);
+                if (!isNaN(rate) && rate > 100 && rate < 1000) {
+                    return rate;
+                }
             }
             
             return null;
