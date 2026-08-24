@@ -6,8 +6,8 @@ const App = {
     history: [],
     isLoading: false,
 
-    // URL del BCV con proxy CORS
-    BCV_URL: 'https://api.allorigins.win/raw?url=https://www.bcv.org.ve/',
+    // URL del BCV - usamos jina.ai reader para evitar problemas CORS
+    BCV_URL: 'https://r.jina.ai/https://www.bcv.org.ve/',
 
     // Inicializar la app
     init() {
@@ -60,26 +60,30 @@ const App = {
         }
     },
 
-    // Obtener tasa del BCV (simulada para la web)
+    // Obtener tasa del BCV usando jina.ai reader (evita CORS)
     async getBCVRate() {
         try {
-            // En producción, aquí harías fetch al BCV
-            // Por ahora usamos la tasa conocida
             const response = await fetch(this.BCV_URL);
-            const html = await response.text();
+            const text = await response.text();
             
-            // Buscar el patrón del dólar en el HTML
-            // El BCV muestra: USD 784,66330000
-            const usdMatch = html.match(/USD[\s\S]*?([\d.,]+)/i);
+            // Buscar la tasa USD en el contenido markdown
+            // El formato es: **784,66330000** (en negrita) o 784,66330000
+            const rateMatch = text.match(/\*\*?([\d.,]+)\*\*?/);
             
-            if (usdMatch) {
-                // Convertir formato venezolano (coma como decimal) a formato internacional
-                let rateStr = usdMatch[1].replace('.', '').replace(',', '.');
-                return parseFloat(rateStr);
+            if (rateMatch) {
+                let rateStr = rateMatch[1];
+                // El BCV usa coma como decimal: "784,66330000"
+                // Convertimos a formato internacional: "784.66330000"
+                rateStr = rateStr.replace(',', '.');
+                // Limitar a 4 decimales como máximo
+                const rate = parseFloat(rateStr);
+                if (!isNaN(rate) && rate > 100 && rate < 10000) {
+                    return rate;
+                }
             }
             
-            // Si no encuentra el patrón, usar regex más específico
-            const alternativeMatch = html.match(/784[\.,]\d+/);
+            // Alternativa: buscar el patrón "784,..." propio de BCV
+            const alternativeMatch = text.match(/784[\.,]\d+/);
             if (alternativeMatch) {
                 return parseFloat(alternativeMatch[0].replace(',', '.'));
             }
