@@ -22,6 +22,7 @@ const App = {
         document.getElementById('convertBtn').addEventListener('click', () => this.convert());
         document.getElementById('refreshBtn').addEventListener('click', () => this.fetchExchangeRate());
         document.getElementById('clearHistoryBtn').addEventListener('click', () => this.clearHistory());
+        document.getElementById('copyBtn').addEventListener('click', () => this.copyResult());
         document.getElementById('usdAmount').addEventListener('keypress', (e) => {
             if (e.key === 'Enter') this.convert();
         });
@@ -191,6 +192,46 @@ const App = {
         const input = document.getElementById('usdAmount');
         input.style.animation = 'shake 0.5s ease';
         setTimeout(() => input.style.animation = '', 500);
+    },
+
+    // Copiar resultado al portapapeles
+    copyResult() {
+        const value = document.getElementById('vesResult').textContent.replace('Bs ', '');
+        const btn = document.getElementById('copyBtn');
+        
+        if (navigator.clipboard && window.isSecureContext) {
+            navigator.clipboard.writeText(value).then(() => {
+                this.showCopiedFeedback(btn);
+            });
+        } else {
+            // Fallback para entornos sin clipboard API
+            const textarea = document.createElement('textarea');
+            textarea.value = value;
+            textarea.style.position = 'fixed';
+            textarea.style.opacity = '0';
+            textarea.style.left = '-9999px';
+            document.body.appendChild(textarea);
+            textarea.select();
+            try {
+                document.execCommand('copy');
+                this.showCopiedFeedback(btn);
+            } catch (e) {
+                prompt('Copia manualmente:', value);
+            }
+            document.body.removeChild(textarea);
+        }
+    },
+
+    showCopiedFeedback(btn) {
+        const originalSvg = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>';
+        const checkSvg = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>';
+        
+        btn.classList.add('copied');
+        btn.innerHTML = checkSvg;
+        setTimeout(() => {
+            btn.classList.remove('copied');
+            btn.innerHTML = originalSvg;
+        }, 1500);
     },
 
     // Agregar al historial
