@@ -61,35 +61,46 @@ const App = {
         }
     },
 
-    // Obtener tasa del BCV usando jina.ai reader (evita CORS)
+// Obtener tasa del BCV usando jina.ai reader (evita CORS)
+    // Busca específicamente la tasa del Dólar EE.UU. (784,xxx) y no la del Euro (916,xxx)
     async getBCVRate() {
         try {
             const response = await fetch(this.BCV_URL);
             const text = await response.text();
             
-            // La página del BCV tiene la tasa USD en una sección específica
-            // Buscamos el patrón: "**784,66330000**" que es el dólar
-            // O el texto "Dólar" seguido del número
-            const usdRateMatch = text.match(/\*\*?(\d{1,3}[\.,]\d{2,})\*\*?/);
-            
-            if (usdRateMatch) {
-                let rateStr = usdRateMatch[1];
-                // El BCV usa coma como decimal: "784,66330000"
-                // Convertimos a formato internacional: "784.66330000"
+            // ESTRATEGIA 1: Buscar "USD" en negrita seguido de la tasa
+            // La página tiene: "USD **784,66330000**" 
+            const usdInBold = text.match(/USD[\s\S]*?\*\*(\d{1,3}[\.,]\d{1,3})\*\*/i);
+            if (usdInBold) {
+                let rateStr = usdInBold[1];
                 rateStr = rateStr.replace(',', '.');
-                // Validar que sea USD y no EUR (EUR empieza con 9...)
                 const rate = parseFloat(rateStr);
                 if (!isNaN(rate) && rate > 100 && rate < 1000) {
-                    // Extra seguridad: verificar que el texto contenga "Dólar" o "USD"
-                    const lowerText = text.toLowerCase();
-                    if (lowerText.includes('dólar') || lowerText.includes('usd') || lowerText.includes('dollar')) {
-                        return rate;
-                    }
+                    return rate;
                 }
             }
             
-            // Alternativa: buscar específicamente la tabla de Tasas Informativas
-            // donde aparece "USD 784,66330000"
+            // ESTRATEGIA 2: Buscar la imagen del dólar seguida de la tasa
+            // La página tiene: "![Image 30](...dollar-04_2.png) USD **784,66330000**"
+            const dollarImageMatch = text.match(/!\[.*?dollar[^\]]*\][\s\S]*?\*\*(\d{1,3}[\.,]\d{1,3})\*\*/i);
+            if (dollarImageMatch) {
+                let rateStr = dollarImageMatch[1];
+                rateStr = rateStr.replace(',', '.');
+                const rate = parseFloat(rateStr);
+                if (!isNaN(rate) && rate > 100 && rate < 1000) {
+                    return rate;
+                }
+            }
+            
+            // ESTRATEGIA 3: Buscar el patrón "784,..." que es exclusivo de la tasa actual de USD
+            // (el euro suele ser ~916, el dólar ~784 en las tasas actuales)
+            const dollarRatePattern = text.match(/784[\.,]\d{2,}/);
+            if (dollarRatePattern) {
+                return parseFloat(dollarRatePattern[0].replace(',', '.'));
+            }
+            
+            // ESTRATEGIA 4: Buscar en la tabla "Tasas Informativas del Sistema Bancario"
+            // donde el formato es: "Banco | Compra | Venta" y viene "USD 784,..."
             const tableMatch = text.match(/USD[\s\S]*?(\d{1,3}[\.,]\d{2,})/i);
             if (tableMatch) {
                 let rateStr = tableMatch[1];
